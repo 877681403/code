@@ -1,0 +1,49 @@
+Liu.123456
+oracle 主目录密码：123
+
+
+sqlplus / as sysdba
+
+--创建临时表空间
+create temporary tablespace liuxiangnan_temp tempfile 'D:\app\lxn\product\12.2.0\dbhome_1\database\liuxiangnan_temp.dbf'
+size 10m
+autoextend on 
+next 10m maxsize 20480m
+extent management local;
+
+--创建数据表空间
+create tablespace liuxiangnan 
+logging
+datafile
+'D:\app\lxn\product\12.2.0\dbhome_1\database\liuxiangnan.dbf'
+size 10m
+autoextend on
+next 10m maxsize 20480m
+extent management local;
+
+--创建用户并指定表空间，第一个是用户，第二个是密码
+create user liuxiangnan identified by 123
+default tablespace liuxiangnan
+temporary tablespace liuxiangnan_temp;
+
+--给用户授予权限
+grant connect,resource,dba to liuxiangnan;
+
+--给用户无限表空间权限
+grant unlimited tablespace to liuxiangnan;
+
+--授权成功后登陆账户
+liuxiangnan  123
+
+--查询当前表空间
+select username,default_tablespace from user_users;
+
+--删除表空间
+--drop tablespace liuxiangnan;
+
+--删除用户
+--drop user liuxiangnan;
+
+
+--撤销权限
+--revoke 权限1,权限2, from 用户名;
