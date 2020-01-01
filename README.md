@@ -2,6 +2,7 @@ oracleSql
 Liu.123456
 
 ssh-keygen -t rsa -C "877681403@qq.com"
+cat ~/.ssh/id_rsa.pub
 
 …or create a new repository on the command line
 echo "# code" >> README.md
