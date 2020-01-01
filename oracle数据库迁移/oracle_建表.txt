@@ -1,0 +1,244 @@
+--生成系统维表，用于在老库创建视图，加快生成同步配置表(需要建在老库)
+create table dwmigexp.tb_dic_dba_segments
+(owner varchar2(50),
+segment_name varchar2(50),
+partition_name varchar2(50),
+tablespace_name varchar2(50),
+segment_type varchar2(50),
+bytes number,
+unique_id varchar2(128),
+priority number,
+dblink varchar2(128)
+);
+grant all on dwmigexp.tb_dic_dba_segments to public;
+
+------------------------------------------------
+
+--创建维表索引
+create index dwmigexp.index_unique_id
+on dwmigexp.tb_dic_dba_segments(unique_id)
+
+------------------------------------------------
+
+--创建配置表
+create table liuxiangnan.tb_dic_sync_cfg
+(unique_no varchar2(128),
+schema_name varchar2(30),
+table_name  varchar2(30),
+view_owner   varchar2(30),
+view_name  varchar2(30),
+partition_name  varchar2(30),
+subpartition_name  varchar2(30),
+tablespace_name  varchar2(30),
+segment_tp  varchar2(30),
+status number,
+count_1 number,
+p_bytes number,
+priority number
+);
+grant all on liuxiangnan.tb_dic_sync_cfg to public;
+
+-------------------------------------------------
+
+--创建配置表索引
+create index liuxiangnan.index_unique_no
+on liuxiangnan.tb_dic_sync_cfg(unique_no); 
+
+-------------------------------------------------
+
+--生成配置表过程中写的日志表
+create table dwmigexp.tb_dic_sync_cfg_err
+(table_owner varchar2(30),
+ table_name varchar2(30),
+ partition_name varchar2(50),
+ deal_time   date,
+ position   varchar2(50),
+ err_desc  varchar2(512)
+ );
+grant all on dwmigexp.tb_dic_sync_cfg_err to public;
+
+--------------------------------------------------
+
+--生成配置表，过程异常处理
+create table dwmigexp.tb_dic_err_desc
+(err_pos varchar2(30),
+err_desc varchar2(512)
+);
+grant all on dwmigexp.tb_dic_err_desc to public;
+
+--------------------------------------------------
+
+--创建序列
+create sequence dwmigexp.seq_view
+start with 1
+increment by 1;
+
+---------------------------------------------------
+
+--创建同步日志表
+create table liuxiangnan.tb_sync_log
+(
+  unique_no varchar2(128),
+  schema_name varchar2(30),
+  table_name  varchar2(30),
+  partition_name varchar2(30),
+  subpartition_name varchar2(30),
+  begin_date  date,
+  end_date    date,
+  status      number,
+  src_count   number(12),
+  des_count   number(12),
+  error_desc  varchar2(4000),
+  date_1      date,
+  date_2      date,
+  date_3      date,
+  date_4      date
+);
+grant all on liuxiangnan.tb_sync_log to public;
+
+----------------------------------------------------
+
+--20191221
+
+
+--生成配置表2，过程异常打印的日志
+create table dwmigexp.tb_dic_sync_err
+(
+ err_pos    varchar2(50),
+ err_desc   varchar2(300),
+ table_owner varchar2(50),
+ table_name varchar2(50) ,
+ partition_name varchar2(50)  
+);
+grant all on dwmigexp.tb_dic_sync_err to public;
+
+-----------------------------------------------------
+
+--数据稽核后对异常数据进行处理
+create table liuxiangnan.tb_dic_sync_again(
+ owner varchar2(50),
+ table_name varchar2(50) ,
+ partition_name varchar2(50) ,
+ remark varchar2(200),
+re_date date 
+);
+grant all on liuxiangnan.tb_dic_sync_again to public;
+
+------------------------------------------------------
+
+--创建辅表
+create table liuxiangnan.tb_sys_mig_tab_qianyi(
+owner varchar2(50),       --模式
+table_name varchar2(50) , --表名
+table_type char(1),       --是否是分区表（Y是，N否）
+partition_type varchar2(50),--分区类型(日分区表、月份区表、年分区表、特殊分区表、非分区表)
+partition_sub_type varchar2(50),--分区子类型(日增量、月增量、年增量、非分区、特殊分区)
+sync_flag varchar2(1),--是否同步（Y同步，N不同步，O待确认）
+total_size_m number, --表总大小
+tmp_flag varchar2(1), --临时表（Y是、N否）
+sync_way varchar2(1), --同步方式（DB_LINK,调度）
+load_type varchar2(50) ,--加载方式（替换、追加）
+load_period varchar2(50) ,--装在周期（D、M、Y）
+single_size_m number,--单周期大小，一天数据量
+cycle_column varchar2(50) ,--周期字段
+data_source varchar2(50) --数据源你（A、B、V）--分别表示三个数据库   
+);
+grant all on liuxiangnan.tb_sys_mig_tab_qianyi to public;
+
+---------------------------------------------------------
+
+--创建辅表索引
+create index index_1 on liuxiangnan.tb_sys_mig_tab_qianyi(owner,table_name);
+
+
+---------------------------------------------------------
+
+--生成辅表的错误日志表
+create table liuxiangnan.tb_sys_mig_tab_qianyi_err(
+  run_time date,
+  error varchar2(300)
+);
+grant all on liuxiangnan.tb_sys_mig_tab_qianyi_err to public;
+
+--------------------------------------------------------
+
+--迁移总清单表
+create table liuxiangnan.tb_dic_qianyi_tab(
+owner varchar2(50) ,
+table_name varchar2(50) ,
+sync_flag varchar2(50) ,
+total_size_m varchar2(200),
+single_size_m varchar2(200),
+load_period varchar2(50) ,
+cycle_column varchar2(50) ,
+sync_source varchar2(50) ,
+sync_way varchar2(50) ,
+partition_tab varchar2(50) ,
+partition_type varchar2(50) ,
+partition_subtype varchar2(50) ,
+tmp_flag varchar2(50) ,
+load_way varchar2(50) ,
+business_type varchar2(50) ,
+max_date varchar2(50) ,
+min_date varchar2(50) ,
+tab_count varchar2(200),  
+partition_count varchar2(200),
+exist_part_flag varchar2(200),
+last_day_end_month varchar2(200),
+remarks1 varchar2(200),
+feedback_sync_flag varchar2(200),
+feedback_people varchar2(200),
+online_or_not varchar2(200),
+feedback_min_date varchar2(200),
+feedback_max_date varchar2(200)
+);
+grant all on liuxiangnan.tb_dic_qianyi_tab to public;
+
+------------------------------------------------------
+
+--重建视图维表（这个需要更新配置表1，然后删除配置表2的相关记录，在跑配置表2的过程）
+create table liuxiangnan.tb_re_create_tab_list(
+owner varchar2(50),
+table_name varchar2(50),
+re_date date
+);
+grant all on liuxiangnan.tb_re_create_tab_list to public;
+
+------------------------------------------------------
+
+--重建视图的维表
+create table liuxiangnan.tb_zy_create_table(
+owner varchar2(50),
+table_name varchar2(50),
+partition_name varchar2(50),
+ort_time date
+);
+grant all on liuxiangnan.tb_zy_create_table to public;
+
+------------------------------------------------------
+
+--生成非DB_LINK同步的表（在此表中）
+create table liuxiangnan.tb_dic_sync_non_db_link(
+owner varchar2(50),
+table_name varchar2(50),
+table_type varchar2(50),
+partition_type varchar2(50),
+partition_sub_type varchar2(50),
+sync varchar2(50),
+bytes number,
+mid_tmp varchar2(50),
+sync_way varchar2(50),
+single_size number,
+cycle_name varchar2(50)
+);
+grant all on liuxiangnan.tb_dic_sync_non_db_link to public;
+
+-------------------------------------------------------
+
+--迁移用户维表
+create table liuxiangnan.tb_dic_qianyi_users(
+username varchar2(50)
+);
+grant all on liuxiangnan.tb_dic_qianyi_users to public;
+
+
