@@ -1,8 +1,20 @@
 Liu.123456
 oracle 主目录密码：123
 
+-------------------------------------------------------
+--登录方式
 
 sqlplus / as sysdba
+
+sqlplus liuxiangnan/123
+
+sqlplus /nolog
+liuxiangnan
+123
+
+plsql登录
+
+--------------------------------------------------------
 
 --创建临时表空间
 create temporary tablespace liuxiangnan_temp tempfile 'D:\app\lxn\product\12.2.0\dbhome_1\database\liuxiangnan_temp.dbf'
