@@ -82,6 +82,19 @@ create public database link to_old_a
 		
 		
 	
-		
+--创建本地库库指向新远端（张育珲）库的BD_LINK
+create public database link qianyi
+  connect to LXN identified by "oracle"
+  using'(DESCRIPTION=
+        (ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=62.234.148.85)(PORT=1521)))
+        (LOAD_BALANCE==yes)
+    (CONNECT_DATA=(SERVICE_NAME=XE))
+        )';
+
+
+
+
+
+
 		
 		
